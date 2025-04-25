@@ -1,12 +1,14 @@
 import React from 'react';
 import { Save, RotateCcw } from 'lucide-react';
 import { MetricSlider } from './ui/MetricSlider';
+import { ParameterField } from './ParameterField';
 import { SettingsSection } from './ui/SettingsSection';
+import { ForecastModeSelector } from './ForecastModeSelector';
 import type { BusinessMetrics } from '../types/business';
 
 interface ControlPanelProps {
   metrics: BusinessMetrics;
-  onChange: (key: keyof BusinessMetrics, value: number) => void;
+  onChange: (key: keyof BusinessMetrics, value: any) => void;
   onReset: () => void;
   onSave: () => void;
 }
@@ -16,33 +18,32 @@ export function ControlPanel({ metrics, onChange, onReset, onSave }: ControlPane
     operations: {
       title: 'Business Operations',
       metrics: [
-        { key: 'dailyOrders', label: 'Daily Orders', suffix: ' orders/day', prefix: '' },
-        { key: 'branchCapacity', label: 'Branch Capacity', suffix: ' orders/day', prefix: '' },
-        { key: 'monthlyGrowthRate', label: 'Monthly Growth Rate (Average)', suffix: '%', prefix: '' },
+        { key: 'dailyOrders', label: 'Daily Orders', suffix: ' orders/day', prefix: '', useField: true },
+        { key: 'branchCapacity', label: 'Branch Capacity', suffix: ' orders/day', prefix: '', useField: false },
       ],
     },
     pricing: {
       title: 'Pricing & Delivery',
       metrics: [
-        { key: 'averageOrderPrice', label: 'Average Order Price', prefix: 'SAR ', suffix: '' },
-        { key: 'deliveryCostPerCustomer', label: 'Delivery Cost per Customer/Order', prefix: 'SAR ', suffix: '' },
+        { key: 'averageOrderPrice', label: 'Average Order Price', prefix: 'SAR ', suffix: '', useField: false },
+        { key: 'deliveryCostPerCustomer', label: 'Delivery Cost per Customer/Order', prefix: 'SAR ', suffix: '', useField: false },
       ],
     },
     costs: {
       title: 'Operating Costs',
       metrics: [
-        { key: 'detergentCost', label: 'Detergent Cost per Order', prefix: 'SAR ', suffix: '' },
-        { key: 'packagingCost', label: 'Packaging Cost per Order', prefix: 'SAR ', suffix: '' },
-        { key: 'otherMaterialCosts', label: 'Other Material Costs per Order', prefix: 'SAR ', suffix: '' },
+        { key: 'detergentCost', label: 'Detergent Cost per Order', prefix: 'SAR ', suffix: '', useField: false },
+        { key: 'packagingCost', label: 'Packaging Cost per Order', prefix: 'SAR ', suffix: '', useField: false },
+        { key: 'otherMaterialCosts', label: 'Other Material Costs per Order', prefix: 'SAR ', suffix: '', useField: false },
       ],
     },
     fixed: {
       title: 'Fixed Costs',
       metrics: [
-        { key: 'monthlyRent', label: 'Monthly Rent', prefix: 'SAR ', suffix: '' },
-        { key: 'staffCount', label: 'Staff Count', suffix: ' people', prefix: '' },
-        { key: 'monthlyStaffCostPerPerson', label: 'Monthly Staff Cost per Person', prefix: 'SAR ', suffix: '' },
-        { key: 'monthlyUtilities', label: 'Monthly Utilities', prefix: 'SAR ', suffix: '' },
+        { key: 'monthlyRent', label: 'Monthly Rent', prefix: 'SAR ', suffix: '', useField: false },
+        { key: 'staffCount', label: 'Staff Count', suffix: ' people', prefix: '', useField: false },
+        { key: 'monthlyStaffCostPerPerson', label: 'Monthly Staff Cost per Person', prefix: 'SAR ', suffix: '', useField: false },
+        { key: 'monthlyUtilities', label: 'Monthly Utilities', prefix: 'SAR ', suffix: '', useField: false },
       ],
     },
   };
@@ -70,18 +71,39 @@ export function ControlPanel({ metrics, onChange, onReset, onSave }: ControlPane
       </div>
       
       <div className="space-y-4">
+        {/* Forecast Settings Section */}
+        <SettingsSection title="Forecast Settings">
+          <ForecastModeSelector
+            metrics={metrics}
+            onChange={onChange}
+          />
+        </SettingsSection>
+
+        {/* Other Sections */}
         {Object.entries(sections).map(([key, section]) => (
           <SettingsSection key={key} title={section.title}>
             {section.metrics.map((metric) => (
-              <MetricSlider
-                key={metric.key}
-                label={metric.label}
-                value={metrics[metric.key as keyof BusinessMetrics] || 0}
-                onChange={(value) => onChange(metric.key as keyof BusinessMetrics, value)}
-                metricKey={metric.key as keyof BusinessMetrics}
-                prefix={metric.prefix}
-                suffix={metric.suffix}
-              />
+              <React.Fragment key={metric.key}>
+                {metric.useField ? (
+                  <ParameterField
+                    label={metric.label}
+                    value={metrics[metric.key as keyof BusinessMetrics] as number}
+                    onChange={(value: number) => onChange(metric.key as keyof BusinessMetrics, value)}
+                    prefix={metric.prefix}
+                    suffix={metric.suffix}
+                    step={1}
+                  />
+                ) : (
+                  <MetricSlider
+                    label={metric.label}
+                    value={metrics[metric.key as keyof BusinessMetrics] as number}
+                    onChange={(value) => onChange(metric.key as keyof BusinessMetrics, value)}
+                    metricKey={metric.key as keyof BusinessMetrics}
+                    prefix={metric.prefix}
+                    suffix={metric.suffix}
+                  />
+                )}
+              </React.Fragment>
             ))}
           </SettingsSection>
         ))}

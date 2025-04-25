@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import type { Branch, BusinessMetrics, MetricRanges, BranchSetupCosts } from '../types/business';
 import { useBusinessMetrics } from './useBusinessMetrics';
-import { DEFAULT_RANGES } from '../constants/businessRanges';
+import { DEFAULT_RANGES, DEFAULT_MONTHLY_GROWTH_RATES, DEFAULT_FIXED_MONTHLY_ORDERS } from '../constants/businessRanges';
 
 const STORAGE_KEY = 'laundry-business-branches';
 
@@ -19,6 +19,10 @@ const DEFAULT_METRICS: BusinessMetrics = {
   monthlyUtilities: 0,
   staffCount: 0,
   deliveryCostPerCustomer: 0,
+  // Add the missing properties with sensible defaults:
+  forecastMode: 'single-growth',
+  monthlyGrowthRates: [...DEFAULT_MONTHLY_GROWTH_RATES],
+  fixedMonthlyOrders: [...DEFAULT_FIXED_MONTHLY_ORDERS]
 };
 
 const DEFAULT_SETUP_COSTS: BranchSetupCosts = {
@@ -45,7 +49,7 @@ export function useBranchManagement() {
       id: uuidv4(),
       name: 'Main Branch',
       location: 'City Center',
-      metrics: DEFAULT_METRICS,
+      metrics: { ...DEFAULT_METRICS },
       ranges: DEFAULT_RANGES,
       monthlyData: calculateMetrics(DEFAULT_METRICS),
       setupCosts: DEFAULT_SETUP_COSTS,
@@ -119,7 +123,7 @@ export function useBranchManagement() {
         id: uuidv4(),
         name: 'Main Branch',
         location: 'City Center',
-        metrics: DEFAULT_METRICS,
+        metrics: { ...DEFAULT_METRICS },
         ranges: DEFAULT_RANGES,
         monthlyData: calculateMetrics(DEFAULT_METRICS),
         setupCosts: DEFAULT_SETUP_COSTS,
@@ -135,7 +139,7 @@ export function useBranchManagement() {
   const updateBranchMetrics = useCallback((
     branchId: string,
     key: keyof BusinessMetrics,
-    value: number
+    value: number | number[] | string
   ) => {
     const updatedBranches = branches.map(branch => {
       if (branch.id === branchId) {

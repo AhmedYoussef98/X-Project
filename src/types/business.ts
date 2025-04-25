@@ -15,6 +15,8 @@ export interface BranchSetupCosts {
   initialInventoryCost: number;
 }
 
+export type ForecastMode = 'single-growth' | 'monthly-growth' | 'fixed-orders';
+
 export interface BusinessMetrics {
   dailyOrders: number;
   branchCapacity: number;
@@ -28,6 +30,11 @@ export interface BusinessMetrics {
   monthlyUtilities: number;
   staffCount: number;
   deliveryCostPerCustomer: number;
+  
+  // New fields for advanced forecasting
+  forecastMode: ForecastMode;
+  monthlyGrowthRates: number[];
+  fixedMonthlyOrders: number[];
 }
 
 export interface MetricRange {
@@ -57,4 +64,26 @@ export interface CostBreakdown {
   marketing: number;
   fixed: number;
   total: number;
+}
+
+export interface BranchSummary {
+  totalRevenue: number;
+  totalProfit: number;
+  averageMargin: number;
+  totalOrders: number;
+  averageUtilization: number;
+}
+
+export interface BranchAverages {
+  avgRevenue: number;
+  avgOrders: number;
+  avgProfitMargin: number;
+  avgNetProfit: number;
+  avgTotalCosts: number;
+  avgFixedCosts?: number;
+  avgMaterialsCosts?: number;
+  totalAnnualRevenue?: number;
+  totalAnnualCosts?: number;
+  totalAnnualProfit?: number;
+  totalAnnualOrders?: number;
 }

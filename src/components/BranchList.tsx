@@ -52,7 +52,7 @@ export function BranchList({
             </div>
             <div className="flex items-center space-x-2">
               {!activeBranches.has(branch.id) && (
-                <AlertCircle className="h-4 w-4 text-amber-500" title="Branch excluded from calculations" />
+                <AlertCircle className="h-4 w-4 text-amber-500" data-tooltip="Branch excluded from calculations" />
               )}
               <button
                 onClick={() => handleDelete(branch)}
